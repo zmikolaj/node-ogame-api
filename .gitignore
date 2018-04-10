@@ -1,3 +1,8 @@
+#dev
+ogame_core.js*
+.ogame_core.js*
+ogame_core.*
+
 # Logs
 logs
 *.log
