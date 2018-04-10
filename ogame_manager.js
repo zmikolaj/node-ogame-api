@@ -3,6 +3,7 @@
 const constants = require('./ogame_constants');
 const universePlayers = require('./lib/universePlayers');
 const galaxySearch = require('./lib/galaxySearch');
+const planetManagement = require('./lib/planetManagement');
 const Helpers = require('./lib/helpers.js');
 
 const async = require('async');
@@ -78,13 +79,22 @@ ogameManager.prototype.tryToLogin = function(page, params) {
         }, function(error, resopnse, body) {
             Helpers.setCookieJar(cookieJar);
 
-            galaxySearch.getGalaxy(1, 10).then(function(data) {
+            /*galaxySearch.getGalaxy(1, 10).then(function(data) {
+                console.log(data);
+            });*/
+            planetManagement.getBuildings('33812062').then(function(data) {
                 console.log(data);
             });
-            galaxySearch.getGalaxy(1, 11).then(function(data) {
+            planetManagement.getFacilities('33812062').then(function(data) {
                 console.log(data);
             });
-            galaxySearch.getGalaxy(1, 12).then(function(data) {
+            planetManagement.getResearch().then(function(data) {
+                console.log(data);
+            });
+            planetManagement.getShips('33812062').then(function(data) {
+                console.log(data);
+            });
+            planetManagement.getDefense('33812062').then(function(data) {
                 console.log(data);
             });
 
