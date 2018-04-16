@@ -1,9 +1,9 @@
 'use strict';
 
-const constants = require('./ogame_constants');
-const universePlayers = require('./lib/universePlayers');
-const galaxySearch = require('./lib/galaxySearch');
-const planetManager = require('./lib/planetManagement');
+//const constants = require('./ogame_constants');
+//const universePlayers = require('./lib/universePlayers');
+//const galaxySearch = require('./lib/galaxySearch');
+//const planetManager = require('./lib/planetManagement');
 const Helpers = require('./lib/helpers.js');
 
 const async = require('async');
@@ -42,29 +42,11 @@ ogameManager.prototype.checkIsConnected = function(callback) {
 
     return callback();
 };
-
-ogameManager.prototype.getOgameUrl = function(page, params) {
-    var self = this;
-
-    if (page == 'login') {
-        return 'https://pl.ogame.gameforge.com/main/login';
-    };
-
-    var url = 'https://s148-pl.ogame.gameforge.com/game/index.php?page=' + page;
-
-    if (params) {
-        for (var key in params) {
-            url += '&' + key + '=' + params[key];
-        };
-    };
-
-    return url;
-};
 ogameManager.prototype.tryToLogin = function(page, params) {
     var self = this;
 
     request.post({
-        url: self.getOgameUrl('login'),
+        url: Helpers.getOgameUrl('login'),
         jar: cookieJar,
         form: {
             'kid': '',
@@ -79,10 +61,12 @@ ogameManager.prototype.tryToLogin = function(page, params) {
         }, function(error, resopnse, body) {
             Helpers.setCookieJar(cookieJar);
 
+            self.emit('onLogin');
+
             /*galaxySearch.getGalaxy(1, 10).then(function(data) {
                 console.log(data);
             });*/
-            planetManager.getBuildings('33812062').then(function(data) {
+            /*planetManager.getBuildings('33812062').then(function(data) {
                 console.log(data);
             });
             planetManager.getFacilities('33812062').then(function(data) {
@@ -96,12 +80,12 @@ ogameManager.prototype.tryToLogin = function(page, params) {
             });
             planetManager.getDefense('33812062').then(function(data) {
                 console.log(data);
-            });
+            });*/
 
         	self.getPageOverview();
-            self.getEventBox(function(data) {
+            /*self.getEventBox(function(data) {
                 console.log(data);
-            });
+            });*/
         });
     });
 };
@@ -113,7 +97,7 @@ ogameManager.prototype.tryToLogin = function(page, params) {
 ogameManager.prototype.getPageOverview = function(cp) {
 	var self = this;
     request.get({
-        url: self.getOgameUrl('overview'),
+        url: Helpers.getOgameUrl('overview'),
         jar: cookieJar
     }, function(error, resopnse, body) {
         var $ = cheerio.load(body);
@@ -123,7 +107,7 @@ ogameManager.prototype.getPageOverview = function(cp) {
         	self.loggedIn = false;
         };
 
-
+        self.userPlanets = [];
        	$('.smallplanet').each(function(index) {
        		self.userPlanets.push({
        			name: $(this).find('.planet-name').text(),
@@ -144,7 +128,7 @@ ogameManager.prototype.getAllResources = function() {
 
 	self.userPlanets.forEach((item, index) => {
 		request.get({
-	        url: self.getOgameUrl('fetchResources', {cp: item.id}),
+	        url: Helpers.getOgameUrl('fetchResources', {cp: item.id}),
 	        jar: cookieJar
 	    }, function(error, resopnse, body) {
 	        body = JSON.parse(body);
@@ -160,7 +144,7 @@ ogameManager.prototype.getEventBox = function(callback) {
 	var self = this;
 
 	request.get({
-		url: self.getOgameUrl('fetchEventbox'),
+		url: Helpers.getOgameUrl('fetchEventbox'),
 		jar: cookieJar
 	}, function(error, resopnse, body) {
 		body = JSON.parse(body);
